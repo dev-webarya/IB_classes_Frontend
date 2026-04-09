@@ -1,58 +1,23 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  app:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NODE_ENV: production
-    container_name: education-website-prod
-    image: education-website:latest
+    container_name: IBclassess-frontend
     ports:
-      - "${APP_PORT:-9047}:3000"
+      - "9048:9048"
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - PORT=3000
-      - APP_NAME=${APP_NAME:-Education Website}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-    # Resource limits for production
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
-    # Restart policy
+      - NODE_ENV=${NODE_ENV}
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_APP_NAME=${VITE_APP_NAME}
     restart: unless-stopped
-    # Logging configuration
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-        labels: "service=app"
-    # Health check
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    # Volume mounts
-    volumes:
-      - ./dist:/app/dist:ro
     networks:
-      - education-network
-    labels:
-      com.example.description: "Education Website Production"
-      com.example.version: "1.0"
+      - IBclassess-network
 
 networks:
-  education-network:
+  crm-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
