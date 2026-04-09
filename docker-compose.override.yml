@@ -1,0 +1,26 @@
+version: '3.8'
+
+# This file overrides docker-compose.yml for local development
+# It's automatically loaded when running docker-compose locally
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - education-website:latest
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    ports:
+      - "9047:3000"
+    # Remove resource limits for development
+    deploy: {}
+    # Volume mount for hot reload (optional)
+    # Uncomment if you want to mount source code for development
+    # volumes:
+    #   - ./src:/app/src:cached
+    #   - ./public:/app/public:cached
+    security_opt:
+      - no-new-privileges:false
